@@ -3,7 +3,7 @@ import { View, TextInput, Text, Image, Button  } from "react-native";
 import ImageChooser from "./ImageChooser";
 import Styles from "./Styles";
 
-const PersonalInfo = () => {
+const PersonalInfo = (props) => {
     const [name, setName] = useState("");
     const [image, setImage] = useState("");
 
@@ -19,7 +19,7 @@ const PersonalInfo = () => {
 
             <ImageChooser onChangeImage={(image) => setImage(image)} /> 
 
-            <Button title="Start Chating" onPress={() => {} }/>
+            <Button title="Start Chating" onPress={() => props.onClosed(name, image) }/>
 
         </View>
     );
