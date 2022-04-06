@@ -1,13 +1,16 @@
 {
   "expo": {
-    "name": "chatAppReactNativeExpo",
+    "name": "Chat With Me!",
+    "description": "Here we can chat & share our ideas",
     "slug": "chatAppReactNativeExpo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/chatSplash.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/chatSplash.png",
       "resizeMode": "contain",
+      "width": "auto",
+      "height": "25%",
       "backgroundColor": "#ffffff"
     },
     "updates": {
