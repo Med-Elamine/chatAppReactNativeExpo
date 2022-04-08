@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native';
 import PersonalInfo from './components/PersonalInfo';
 import Styles from "./components/Styles";
 import React, { useState } from 'react';
-import Chat from './components/Chat';
+import Chatting from './components/Chatting';
 import AppLoading from 'expo-app-loading';
 import AsyncStorageLib from '@react-native-async-storage/async-storage';
 
@@ -22,16 +22,19 @@ export default function App() {
     await AsyncStorageLib.setItem(storageImageKey,image);
   }
   
+
   
 
   const fetchPersonalData = async () =>{
     let fetchUserName = await AsyncStorageLib.getItem(storageUserNameKey);
     let userName = fetchUserName == null ? "" : fetchUserName;
-    let fetchImage = await AsyncStorageLib.getItem(storageUserNameKey);
+    let fetchImage = await AsyncStorageLib.getItem(storageImageKey);
     let image = fetchImage == null ? "" : fetchImage;
     setUserName(userName);
     setImage(image);
   }
+
+  
 
   if(isLoading){
     return(
@@ -39,13 +42,13 @@ export default function App() {
     )
   }
 
-  let activeComponent = username != "" ? <Chat username={username} image={image} />
+  let activeComponent = username != "" && image ? <Chatting username={username} image={image} />
 : <PersonalInfo onClosed={onPersonalInfoClosed} />;
 
   return (
     <SafeAreaView style={Styles.container}>
       {activeComponent}
-      <StatusBar style="inverted" />
+      <StatusBar style="dark" />
     </SafeAreaView>
   );
 }
