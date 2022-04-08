@@ -3,6 +3,7 @@ import { Text, View } from "react-native";
 import { Button, FlatList, TextInput, Image, Easing } from "react-native";
 import { Animated } from "react-native";
 import Styles from "./Styles";
+import Socket from './Socket';
 
 const Chatting = (props) => {
     const [chatInput, setChatInput] = useState("");
@@ -13,12 +14,30 @@ const Chatting = (props) => {
         useEffect(() => {
             Animated.timing(animatedValue, {
                 toValue: 1,
-                duration: 400,
+                duration: 500,
                 easing: (number) => Easing.ease(number),
                 useNativeDriver: true,
             }).start();
-        },[animatedValue])
+        },);
 
+        useEffect(async ()=> {
+          (async () => {
+              try {
+                if (Socket.state == "Disconnected") {
+                  await Socket.start();
+                }
+              } catch (err) {
+                console.log(err);
+              }
+            })();
+            await Socket.on("ReceiveMessage", async (chatItem) => {
+              await setChatListItem((chatListItem) => {
+                console.log(chatItem);
+                if (chatListItem.find((i) => i.id == chatItem.id)) return chatListItem;
+                return [...chatListItem, chatItem];
+              });
+            });
+          }, []);
 
     const chatItem = ({item}) => {
         
@@ -34,19 +53,21 @@ const Chatting = (props) => {
             ]}>
                 <View style={Styles.chatItemHeader}>
                     <Image style={Styles.avatarSmall} source={{uri: "data:image/jpeg;base64," + avatarImage}}/>
-                    <Text style={Styles.smallItalicText}>By {item.by} at {new Date(item.date).toLocaleTimeString()}</Text>
+                    <Text style={Styles.smallItalicText}>By {item.by} at {new Date(item.timeStamp).toLocaleTimeString()}</Text>
                 </View>
-                <Text style={Styles.chatText}>{item.msg}</Text>
+                <Text style={Styles.chatText}>{item.text}</Text>
             </Animated.View>
         );
-    }
+    };
+
+    
 
     return(
         <View style={Styles.container}>
             <FlatList 
              style={{marginTop: 50}}
              inverted
-             data={chatListItem.sort((a,b) => b.date-a.date) }
+             data={chatListItem.sort((a,b) => b.timeStamp-a.timeStamp) }
              keyExtractor={(item) => item.id }
              renderItem={chatItem}
             />
@@ -54,20 +75,19 @@ const Chatting = (props) => {
                 <TextInput style={Styles.chatTextInput} 
                 onChangeText={setChatInput}
                 value={chatInput}/>
-                <Button  title="send" onPress={() =>{ setChatListItem([
-                    ...chatListItem,{
-                        id: Math.random().toString(36).substring(7),
-                        by: props.username,
-                        image: props.image,
-                        date: Date.now(),
-                        msg: chatInput,
-                    }
-                ])
+                <Button  title="send" onPress={async () => {
+                await Socket.invoke("SendMessage", {
+                  id: Math.random().toString(36).substring(7),
+                  text: chatInput,
+                  image: props.image,
+                  timeStamp: Date.now(),
+                  by: props.username,
+                });
                 setChatInput("");
                 }}/>
             </View>
         </View>
     );
-}
+};
 
 export default Chatting;
